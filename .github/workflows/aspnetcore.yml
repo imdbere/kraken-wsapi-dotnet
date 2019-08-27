@@ -4,6 +4,9 @@ on:
   push:
     branches:
     - 'chore/*'
+  pull_request:
+    branches:
+    - master
 
 jobs:
   build:
