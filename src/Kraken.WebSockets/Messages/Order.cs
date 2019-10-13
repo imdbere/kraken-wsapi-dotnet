@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
-
-namespace Kraken.WebSockets.Messages
+﻿namespace Kraken.WebSockets.Messages
 {
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// Open orders. Feed to show all the open orders belonging to the user authenticated API key.
     /// </summary>
@@ -17,36 +17,6 @@ namespace Kraken.WebSockets.Messages
         /// </summary>
         private Order()
         {
-        }
-
-        /// <summary>
-        /// Creates from new instance json object.
-        /// </summary>
-        /// <param name="orderId">The order identifier.</param>
-        /// <param name="orderObject">The order object.</param>
-        /// <returns></returns>
-        internal static Order CreateFromJObject(string orderId, JObject orderObject)
-        {
-            return new Order()
-            {
-                OrderId = orderId,
-                RefId = orderObject.Value<string>("refid"),
-                UserRef = orderObject.Value<long>("userref"),
-                Status = orderObject.Value<string>("status"),
-                OpenTimestamp = orderObject.Value<decimal?>("opentm"),
-                StartTimestamp = orderObject.Value<decimal?>("starttm"),
-                ExpireTimestamp = orderObject.Value<decimal?>("expiretm"),
-                Description = OrderDescription.CreateFromJObject(orderObject.Value<JObject>("descr")),
-                Volume = orderObject.Value<decimal?>("vol"),
-                VolumeExecuted = orderObject.Value<decimal>("vol_exec"),
-                Cost = orderObject.Value<decimal?>("cost"),
-                Fee = orderObject.Value<decimal?>("fee"),
-                Price = orderObject.Value<decimal?>("price"),
-                StopPrice = orderObject.Value<decimal?>("stopprice"),
-                LimitPrice = orderObject.Value<decimal?>("limitprice"),
-                Miscellaneous = orderObject.Value<string>("misc"),
-                OrderFlags = orderObject.Value<string>("oflags")
-            };
         }
 
         /// <summary>
@@ -136,6 +106,7 @@ namespace Kraken.WebSockets.Messages
         /// The total cost (quote currency unless unless viqc set in oflags).
         /// </value>
         public decimal? Cost { get; private set; }
+
         /// <summary>
         /// Gets the total fee (quote currency).
         /// </summary>
@@ -151,6 +122,7 @@ namespace Kraken.WebSockets.Messages
         /// The average price (quote currency unless viqc set in oflags).
         /// </value>
         public decimal? Price { get; private set; }
+
         /// <summary>
         /// Gets the stop price (quote currency, for trailing stops).
         /// </summary>
@@ -194,5 +166,35 @@ namespace Kraken.WebSockets.Messages
         /// post  = post only order (available when ordertype = limit)
         /// </remarks>
         public string OrderFlags { get; private set; }
+
+        /// <summary>
+        /// Creates from new instance json object.
+        /// </summary>
+        /// <param name="orderId">The order identifier.</param>
+        /// <param name="orderObject">The order object.</param>
+        /// <returns></returns>
+        internal static Order CreateFromJObject(string orderId, JObject orderObject)
+        {
+            return new Order()
+            {
+                OrderId = orderId,
+                RefId = orderObject.Value<string>("refid"),
+                UserRef = orderObject.Value<long>("userref"),
+                Status = orderObject.Value<string>("status"),
+                OpenTimestamp = orderObject.Value<decimal?>("opentm"),
+                StartTimestamp = orderObject.Value<decimal?>("starttm"),
+                ExpireTimestamp = orderObject.Value<decimal?>("expiretm"),
+                Description = OrderDescription.CreateFromJObject(orderObject.Value<JObject>("descr")),
+                Volume = orderObject.Value<decimal?>("vol"),
+                VolumeExecuted = orderObject.Value<decimal>("vol_exec"),
+                Cost = orderObject.Value<decimal?>("cost"),
+                Fee = orderObject.Value<decimal?>("fee"),
+                Price = orderObject.Value<decimal?>("price"),
+                StopPrice = orderObject.Value<decimal?>("stopprice"),
+                LimitPrice = orderObject.Value<decimal?>("limitprice"),
+                Miscellaneous = orderObject.Value<string>("misc"),
+                OrderFlags = orderObject.Value<string>("oflags")
+            };
+        }
     }
 }

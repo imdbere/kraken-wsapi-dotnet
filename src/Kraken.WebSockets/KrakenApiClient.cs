@@ -23,6 +23,22 @@ namespace Kraken.WebSockets
         private bool disposedValue = false;
 
         /// <summary>
+        /// Initializes a new instance of the class.
+        /// </summary>
+        /// <param name="socket">Socket.</param>
+        /// <param name="serializer">Serializer.</param>
+        /// <exception cref="ArgumentNullException">socket or serialize.</exception>
+        internal KrakenApiClient(IKrakenSocket socket, IKrakenMessageSerializer serializer)
+        {
+            this.socket = socket ?? throw new ArgumentNullException(nameof(socket));
+            this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+
+            // Add watch for incoming messages
+            this.socket.DataReceived += this.HandleIncomingMessage;
+        }
+
+
+        /// <summary>
         /// Gets the system status.
         /// </summary>
         /// <value>The system status.</value>
@@ -89,30 +105,10 @@ namespace Kraken.WebSockets
         /// </summary>
         public event EventHandler<KrakenPrivateEventArgs<OpenOrdersMessage>> OpenOrdersReceived;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:Kraken.WebSockets.KrakenApiClient" /> class.
-        /// </summary>
-        /// <param name="socket">Socket.</param>
-        /// <param name="serializer">Serializer.</param>
-        /// <exception cref="ArgumentNullException">
-        /// socket
-        /// or
-        /// serializer
-        /// </exception>
-        internal KrakenApiClient(IKrakenSocket socket, IKrakenMessageSerializer serializer)
-        {
-            this.socket = socket ?? throw new ArgumentNullException(nameof(socket));
-            this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-
-            // Add watch for incoming messages 
-            this.socket.DataReceived += HandleIncomingMessage;
-        }
 
         /// <summary>
         /// Connects to the websocket endpoint.
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
         public async Task ConnectAsync()
         {
             logger.LogDebug("Connect to the websocket");
@@ -141,7 +137,6 @@ namespace Kraken.WebSockets
         /// Unsubscribe from a specific subscription.
         /// </summary>
         /// <param name="channelId">The channel identifier.</param>
-        /// <returns></returns>
         /// <exception cref="ArgumentNullException">subscription</exception>
         public async Task UnsubscribeAsync(int channelId)
         {
@@ -154,39 +149,36 @@ namespace Kraken.WebSockets
             await socket.SendAsync(new Unsubscribe(channelId));
         }
 
-        #region IDisposable Support
-
-        private void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: Unsubscribe from all active subscriptions
-                    if (Subscriptions.Any())
-                    {
-                        foreach(var subscription in Subscriptions.Keys)
-                        {
-                            UnsubscribeAsync(subscription).GetAwaiter().GetResult();
-                        }
-                    }
-
-                    socket.CloseAsync().GetAwaiter().GetResult();
-                }
-
-                disposedValue = true;
-            }
-        }
-
         /// <summary>
         /// Performs application-defined tasks associated with freeing, 
         /// releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
         }
-        #endregion
+
+        private void Dispose(bool disposing)
+        {
+            if (!this.disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: Unsubscribe from all active subscriptions
+                    if (this.Subscriptions.Any())
+                    {
+                        foreach (var subscription in this.Subscriptions.Keys)
+                        {
+                            this.UnsubscribeAsync(subscription).GetAwaiter().GetResult();
+                        }
+                    }
+
+                    this.socket.CloseAsync().GetAwaiter().GetResult();
+                }
+
+                this.disposedValue = true;
+            }
+        }
 
         #region Private Helper
 
@@ -328,7 +320,5 @@ namespace Kraken.WebSockets
         }
 
         #endregion
-
-        
     }
 }

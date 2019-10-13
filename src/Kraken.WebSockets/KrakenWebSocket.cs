@@ -1,16 +1,16 @@
-﻿using System;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Kraken.WebSockets.Events;
-using Kraken.WebSockets.Logging;
-using Kraken.WebSockets.Messages;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
-
-namespace Kraken.WebSockets
+﻿namespace Kraken.WebSockets
 {
+    using System;
+    using System.Net.WebSockets;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Kraken.WebSockets.Events;
+    using Kraken.WebSockets.Logging;
+    using Kraken.WebSockets.Messages;
+    using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// Kraken websocket.
     /// </summary>
@@ -24,6 +24,17 @@ namespace Kraken.WebSockets
         private readonly IKrakenMessageSerializer serializer;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="T:Kraken.WebSockets.KrakenWebsocket"/> class.
+        /// </summary>
+        /// <param name="uri">URI.</param>
+        public KrakenWebSocket(string uri, IKrakenMessageSerializer serializer)
+        {
+            this.uri = uri ?? throw new ArgumentNullException(nameof(uri));
+            this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            this.webSocket = new ClientWebSocket();
+        }
+
+        /// <summary>
         /// Occurs when connected.
         /// </summary>
         public event EventHandler Connected;
@@ -32,17 +43,6 @@ namespace Kraken.WebSockets
         /// Occurs when data received.
         /// </summary>
         public event EventHandler<KrakenMessageEventArgs> DataReceived;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:Kraken.WebSockets.KrakenWebsocket"/> class.
-        /// </summary>
-        /// <param name="uri">URI.</param>
-        public KrakenWebSocket(string uri, IKrakenMessageSerializer serializer)
-        {
-            this.uri = uri ?? throw new ArgumentNullException(nameof(uri));
-            this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            webSocket = new ClientWebSocket();
-        }
 
         /// <summary>
         /// Connect to the websocket server.

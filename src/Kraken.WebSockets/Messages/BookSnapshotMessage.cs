@@ -1,14 +1,20 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Linq;
-
-namespace Kraken.WebSockets.Messages
+﻿namespace Kraken.WebSockets.Messages
 {
+    using System;
+    using System.Linq;
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// Order book levels. On subscription, a snapshot will be published at the specified depth.
     /// </summary>
     public sealed class BookSnapshotMessage
     {
+        /// <summary>
+        /// Prevents a default instance of the <see cref="BookSnapshotMessage"/> class from being created.
+        /// </summary>
+        private BookSnapshotMessage()
+        { }
+
         /// <summary>
         /// Gets the ChannelID of pair-order book levels subscription.
         /// </summary>
@@ -32,13 +38,6 @@ namespace Kraken.WebSockets.Messages
         /// The Array of price levels, descending from best bid.
         /// </value>
         public PriceLevel[] Bids { get; private set; }
-
-        /// <summary>
-        /// Prevents a default instance of the <see cref="BookSnapshotMessage"/> class from being created.
-        /// </summary>
-        private BookSnapshotMessage()
-        {
-        }
 
         /// <summary>
         /// Creates from string.

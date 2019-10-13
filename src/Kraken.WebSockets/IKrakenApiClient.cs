@@ -1,31 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Kraken.WebSockets.Events;
-using Kraken.WebSockets.Messages;
-
-namespace Kraken.WebSockets
+﻿namespace Kraken.WebSockets
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Kraken.WebSockets.Events;
+    using Kraken.WebSockets.Messages;
+
     /// <summary>
-    /// This interface describes the client for the Kraken WebSocket API
+    /// This interface describes the client for the Kraken WebSocket API.
     /// </summary>
-    public interface IKrakenApiClient: IDisposable
-    {
-        /// <summary>
-        /// Gets the system status.
-        /// </summary>
-        /// <value>The system status.</value>
-        SystemStatus SystemStatus { get; }
-
-        /// <summary>
-        /// Gets the subscriptions.
-        /// </summary>
-        /// <value>The subscriptions.</value>
-        IDictionary<int, SubscriptionStatus> Subscriptions { get; }
-
-        /// <summary>
-        /// Occurs when system status changed.
-        /// </summary>
+    public interface IKrakenApiClient : IDisposable
+    { /// <summary>
+      /// Occurs when system status changed.
+      /// </summary>
         event EventHandler<KrakenMessageEventArgs<Heartbeat>> HeartbeatReceived;
 
         /// <summary>
@@ -79,23 +66,35 @@ namespace Kraken.WebSockets
         event EventHandler<KrakenPrivateEventArgs<OpenOrdersMessage>> OpenOrdersReceived;
 
         /// <summary>
+        /// Gets the system status.
+        /// </summary>
+        /// <value>The system status.</value>
+        SystemStatus SystemStatus { get; }
+
+        /// <summary>
+        /// Gets the subscriptions.
+        /// </summary>
+        /// <value>The subscriptions.</value>
+        IDictionary<int, SubscriptionStatus> Subscriptions { get; }
+
+        /// <summary>
         /// Connects to the websocket endpoint.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Awaitable task.</returns>
         Task ConnectAsync();
 
         /// <summary>
         /// Creates a subscription.
         /// </summary>
         /// <param name="subscribe">The subscription.</param>
-        /// <returns></returns>
+        /// <returns>Awaitable task.</returns>
         Task SubscribeAsync(Subscribe subscribe);
 
         /// <summary>
         /// Unsubscribe from a specific subscription.
         /// </summary>
         /// <param name="channelId">The channel identifier.</param>
-        /// <returns></returns>
+        /// <returns>Awaitable task.</returns>
         Task UnsubscribeAsync(int channelId);
     }
 }
