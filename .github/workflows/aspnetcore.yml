@@ -8,22 +8,13 @@ on:
     branches:
     - master
 
-env:
-  VERSION_MAJOR: 0
-  VERSION_MINOR: 3
-  VERSION_PATCH: 0 
-  VERSION_STRING: $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH
-  DEBUG_VERSION_NUMBER: $VERSION_STRING-b$GITHUB_SHA
-
 jobs:
-   
   build:
-
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v1
-    
+        
     - name: 'Setup .NET CLI Tools'
       uses: actions/setup-dotnet@v1
       with:
@@ -36,6 +27,7 @@ jobs:
       run: dotnet test "src/Kraken.WebSockets.sln" --configuration Release --no-build --no-restore
     
     - name: NuGet Pack
-      run: dotnet pack "src/Kraken.WebSockets/Kraken.WebSockets.csproj" -c Release --no-build -p:Version=$DEBUG_VERSION_NUMBER
+      run: dotnet pack "src/Kraken.WebSockets/Kraken.WebSockets.csproj" -c Release --no-build -p:Version=0.3.0-${GITHUB_SHA::8}
+      shell: bash
 
     
