@@ -34,5 +34,5 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: artifacts
-        path: $GITHUB_WORKSPACE/*.nupkg
+        path: ./*.nupkg
     
