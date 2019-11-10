@@ -27,6 +27,7 @@ namespace Kraken.WebSockets.Messages
         /// <returns></returns>
         internal static Order CreateFromJObject(string orderId, JObject orderObject)
         {
+            var descr = orderObject.Value<JObject>("descr");
             return new Order()
             {
                 OrderId = orderId,
@@ -36,7 +37,7 @@ namespace Kraken.WebSockets.Messages
                 OpenTimestamp = orderObject.Value<decimal?>("opentm"),
                 StartTimestamp = orderObject.Value<decimal?>("starttm"),
                 ExpireTimestamp = orderObject.Value<decimal?>("expiretm"),
-                Description = OrderDescription.CreateFromJObject(orderObject.Value<JObject>("descr")),
+                Description = descr != null ? OrderDescription.CreateFromJObject(descr) : null,
                 Volume = orderObject.Value<decimal?>("vol"),
                 VolumeExecuted = orderObject.Value<decimal>("vol_exec"),
                 Cost = orderObject.Value<decimal?>("cost"),
