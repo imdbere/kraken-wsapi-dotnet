@@ -215,6 +215,9 @@ namespace Kraken.WebSockets
                         var subscriptionStatus = serializer.Deserialize<SubscriptionStatus>(eventArgs.RawContent);
                         logger.LogTrace("Subscription status changed: {@subscriptionStatus}", subscriptionStatus);
 
+                        if (subscriptionStatus.Status == "error")
+                            logger.LogWarning(subscriptionStatus.ErrorMessage);
+
                         SynchronizeSubscriptions(subscriptionStatus);
                         SubscriptionStatusChanged.InvokeAll(this, subscriptionStatus);
                     }
