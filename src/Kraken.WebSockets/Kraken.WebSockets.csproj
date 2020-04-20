@@ -9,6 +9,7 @@
     <PackageProjectUrl>https://github.com/m4cx/kraken-wsapi-dotnet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/m4cx/kraken-wsapi-dotnet.git</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
