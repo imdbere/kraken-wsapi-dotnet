@@ -1,7 +1,7 @@
 variables:
     major: 0
-    minor: 3
-    patch: 0
+    minor: 5
+    patch: 2
     versionNumber: $(major).$(minor).$(patch)
     debugVersionNumber: $(versionNumber)-b$(Build.BuildId)  
 
@@ -13,7 +13,8 @@ jobs:
   # Lint commits
   - script: npm install 
   - script: ./node_modules/.bin/commitlint-azure-pipelines
-# Pre-Release Build  
+  
+  # Pre-Release Build  
 - job: "BuildPreRelease"
   dependsOn: "linting"
   condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
@@ -22,18 +23,25 @@ jobs:
   displayName: "Build Pre-Release"
   steps:
   # Restore NuGet Packages
-  - script: 'dotnet restore "src/Kraken.WebSockets.sln"'
+  - script: 'dotnet restore "Kraken.WebSockets.sln"'
     displayName: "Restore NuGet Packages"
+  - task: SonarCloudPrepare@1
+    inputs:
+      SonarCloud: 'SonarCloud M4cX'
+      organization: 'm4cx-github'
+      scannerMode: 'MSBuild'
+      projectKey: 'kraken-wsapi-dotnet'
+      projectName: 'kraken-wsapi-dotnet'
   # Build all projects with specific version number
-  - script: 'dotnet build "src/Kraken.WebSockets.sln" -c Release --no-restore -p:Version=$(debugVersionNumber)'
+  - script: 'dotnet build "Kraken.WebSockets.sln" -c Release --no-restore -p:Version=$(debugVersionNumber)'
     displayName: 'dotnet build'
   # Execute defined tests and collect code coverage
   - task: DotNetCoreCLI@2
     displayName: 'dotnet test'
     inputs:
       command: test
-      projects: src/Kraken.WebSockets.Tests/Kraken.WebSockets.Tests.csproj
-      arguments: '--no-restore --no-build -c Release --collect "Code coverage" --settings:../../codecoverage.runsettings'
+      projects: test/Kraken.WebSockets.Tests/Kraken.WebSockets.Tests.csproj
+      arguments: '--no-restore --no-build -c Release --collect "Code coverage" --settings:./codecoverage.runsettings'
   # Create NuGet Package
   - script: dotnet pack "src/Kraken.WebSockets/Kraken.WebSockets.csproj" -c Release --no-build --output "$(Build.ArtifactStagingDirectory)" -p:Version=$(debugVersionNumber)
     displayName: "Create NuGet Package"
@@ -47,25 +55,12 @@ jobs:
     inputs:
       pathtoPublish: "$(Build.ArtifactStagingDirectory)"
       artifactName: "drop"
-# - job: "DeployPreRelease"
-#   displayName: "Deploy Pre-Release"
-#   condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
-#   dependsOn: "BuildPreRelease"
-#   steps:
-#   # Download artifacts
-#   - task: DownloadBuildArtifacts@0
-#     displayName: "Download files"
-#     inputs:
-#       artifactName: "drop"
-#       downloadPath: $(System.DefaultWorkingDirectory)
-#   # Publish NuGet Package
-#   - task: NuGetCommand@2
-#     displayName: "Publish Pre-Release to NuGet Gallery"
-#     inputs:
-#       command: push
-#       nuGetFeedType: external
-#       publishFeedCredentials: 'Official NuGet'
-#       packagesToPush: '$(System.DefaultWorkingDirectory)/**/*.nupkg;!$(System.DefaultWorkingDirectory)/**/*.symbols.nupkg'
+  - task: SonarCloudAnalyze@1
+
+  - task: SonarCloudPublish@1
+    inputs:
+      pollingTimeoutSec: '300'
+
 
 # Release Build
 - job: "BuildRelease"
@@ -76,18 +71,25 @@ jobs:
   dependsOn: "linting"
   steps:
   # Restore NuGet Packages
-  - script: 'dotnet restore "src/Kraken.WebSockets.sln"'
+  - script: 'dotnet restore "Kraken.WebSockets.sln"'
     displayName: "Restore NuGet Packages"
+  - task: SonarCloudPrepare@1
+    inputs:
+      SonarCloud: 'SonarCloud M4cX'
+      organization: 'm4cx-github'
+      scannerMode: 'MSBuild'
+      projectKey: 'kraken-wsapi-dotnet'
+      projectName: 'kraken-wsapi-dotnet'
   # Build all projects with specific version number
-  - script: 'dotnet build "src/Kraken.WebSockets.sln" -c Release --no-restore -p:Version=$(versionNumber)'
+  - script: 'dotnet build "Kraken.WebSockets.sln" -c Release --no-restore -p:Version=$(versionNumber)'
     displayName: 'dotnet build'
   # Execute defined tests and collect code coverage
   - task: DotNetCoreCLI@2
     displayName: 'dotnet test'
     inputs:
       command: test
-      projects: src/Kraken.WebSockets.Tests/Kraken.WebSockets.Tests.csproj
-      arguments: '--no-restore --no-build -c Release --collect "Code coverage" --settings:../../codecoverage.runsettings'
+      projects: test/Kraken.WebSockets.Tests/Kraken.WebSockets.Tests.csproj
+      arguments: '--no-restore --no-build -c Release --collect "Code coverage" --settings:./codecoverage.runsettings'
   # Create NuGet Package
   - script: dotnet pack "src/Kraken.WebSockets/Kraken.WebSockets.csproj" -c Release --no-build --output "$(Build.ArtifactStagingDirectory)" -p:Version=$(versionNumber)
     displayName: "Create NuGet Package"
@@ -101,22 +103,9 @@ jobs:
     inputs:
       pathtoPublish: "$(Build.ArtifactStagingDirectory)"
       artifactName: "drop"
-# - job: "DeployRelease"
-#   displayName: "Deploy Release"
-#   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
-#   dependsOn: "BuildRelease"
-#   steps:
-#   # Download artifacts
-#   - task: DownloadBuildArtifacts@0
-#     displayName: "Download files"
-#     inputs:
-#       artifactName: "drop"
-#       downloadPath: $(System.DefaultWorkingDirectory)
-#   # Publish NuGet Package
-#   - task: NuGetCommand@2
-#     displayName: "Publish Release to NuGet Gallery"
-#     inputs:
-#       command: push
-#       nuGetFeedType: external
-#       publishFeedCredentials: 'Official NuGet'
-#       packagesToPush: '$(System.DefaultWorkingDirectory)/**/*.nupkg;!$(System.DefaultWorkingDirectory)/**/*.symbols.nupkg'
+  - task: SonarCloudAnalyze@1
+
+  - task: SonarCloudPublish@1
+    inputs:
+      pollingTimeoutSec: '300'
+

@@ -69,6 +69,16 @@ namespace Kraken.WebSockets
         event EventHandler<KrakenDataEventArgs<BookUpdateMessage>> BookUpdateReceived;
 
         /// <summary>
+        /// Occurs when own trades information was received.
+        /// </summary>
+        event EventHandler<KrakenPrivateEventArgs<OwnTradesMessage>> OwnTradesReceived;
+
+        /// <summary>
+        /// Occurs when open orders information was received.
+        /// </summary>
+        event EventHandler<KrakenPrivateEventArgs<OpenOrdersMessage>> OpenOrdersReceived;
+
+        /// <summary>
         /// Connects to the websocket endpoint.
         /// </summary>
         /// <returns></returns>
@@ -87,5 +97,20 @@ namespace Kraken.WebSockets
         /// <param name="channelId">The channel identifier.</param>
         /// <returns></returns>
         Task UnsubscribeAsync(int channelId);
+
+        /// <summary>
+        /// Adds the order.
+        /// </summary>
+        /// <param name="addOrderCommand">The add order message.</param>
+        /// <returns></returns>
+        Task AddOrder(AddOrderCommand addOrderCommand);
+
+        /// <summary>
+        /// Cancels the order.
+        /// </summary>
+        /// <param name="cancelOrder">The cancel order.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">cancelOrder</exception>
+        Task CancelOrder(CancelOrderCommand cancelOrder);
     }
 }

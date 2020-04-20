@@ -1,0 +1,52 @@
+name: kraken-wsapi-dotnet-ci
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NUGET_SERVER: https://api.nuget.org/v3/index.json
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: "Read package version"
+        id: package-version
+        uses: tyankatsu0105/read-package-version-actions@v1
+
+      - name: "Get Short Commit SHA"
+        id: vars
+        run: |
+          echo ::set-output name=sha_short::$(git rev-parse --short ${{ github.sha }})
+
+      - name: "Setup .NET CLI Tools"
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.201
+
+# ======================================
+# Build and publish pre-release
+# --------------------------------------
+      - name: Build pre-release with dotnet
+        run: dotnet build "Kraken.WebSockets.sln" --configuration Release -p:Version=${{ format('{0}-b{2}.{1}', steps.package-version.outputs.version, steps.vars.outputs.sha_short, github.run_number) }}
+
+      - name: Test
+        run: dotnet test "Kraken.WebSockets.sln" --configuration Release --no-build --no-restore
+
+      - name: NuGet Pack pre-release
+        id: nuget-pack
+        shell: bash
+        run: dotnet pack "src/Kraken.WebSockets/Kraken.WebSockets.csproj" -c Release --no-build -p:Version=${{ format('{0}-b{2}.{1}', steps.package-version.outputs.version, steps.vars.outputs.sha_short, github.run_number) }} --output $GITHUB_WORKSPACE/publish
+
+      - name: NuGet Push pre-release
+        id: nuget-push
+        run: |
+          dotnet nuget list source
+          dotnet nuget push **/*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source "nuget.org"
+# ======================================
+      - name: upload
+        uses: actions/upload-artifact@master
+        with:
+          name: artifacts
+          path: ./publish
