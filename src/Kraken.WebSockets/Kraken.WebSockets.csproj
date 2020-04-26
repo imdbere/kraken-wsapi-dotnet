@@ -4,11 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackOnBuild>false</PackOnBuild>
     <Authors>m4cx</Authors>
-    <PackageId>Kraken.WebSockets</PackageId>
+    <PackageId>Coinpanion.Kraken.WebSockets</PackageId>
     <Description>Public WebSocket API Client for kraken.com </Description>
     <PackageProjectUrl>https://github.com/m4cx/kraken-wsapi-dotnet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/m4cx/kraken-wsapi-dotnet.git</RepositoryUrl>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <RepositoryType>git</RepositoryType>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

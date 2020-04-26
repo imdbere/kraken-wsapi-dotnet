@@ -43,6 +43,7 @@ namespace Kraken.WebSockets.Messages
                 Cost = orderObject.Value<decimal?>("cost"),
                 Fee = orderObject.Value<decimal?>("fee"),
                 Price = orderObject.Value<decimal?>("price"),
+                AveragePrice = orderObject.Value<decimal?>("avg_price"),
                 StopPrice = orderObject.Value<decimal?>("stopprice"),
                 LimitPrice = orderObject.Value<decimal?>("limitprice"),
                 Miscellaneous = orderObject.Value<string>("misc"),
@@ -152,6 +153,14 @@ namespace Kraken.WebSockets.Messages
         /// The average price (quote currency unless viqc set in oflags).
         /// </value>
         public decimal? Price { get; private set; }
+
+		/// <summary>
+		/// Gets the average price of an Order
+		/// </summary>
+		/// <value>
+		/// The average price
+		/// </value>
+		public decimal? AveragePrice { get; private set; }
         /// <summary>
         /// Gets the stop price (quote currency, for trailing stops).
         /// </summary>
